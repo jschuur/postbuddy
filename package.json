@@ -1,9 +1,9 @@
 {
-  "name": "my-app",
+  "name": "postbuddy",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "sst bind next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -26,5 +26,10 @@
     "tailwindcss": "3.3.3",
     "tailwindcss-animate": "^1.0.7",
     "typescript": "5.2.2"
+  },
+  "devDependencies": {
+    "sst": "^2.24.23",
+    "aws-cdk-lib": "2.94.0",
+    "constructs": "10.2.70"
   }
 }
