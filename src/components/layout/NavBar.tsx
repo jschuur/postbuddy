@@ -12,7 +12,7 @@ export default function MainNav({ className, ...props }: React.HTMLAttributes<HT
         href='/feeds'
         className='text-medium font-medium text-muted-foreground transition-colors hover:text-primary'
       >
-        Manage Feeds
+        Feeds
       </Link>
     </nav>
   );

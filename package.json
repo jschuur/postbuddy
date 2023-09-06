@@ -3,33 +3,54 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "sst bind next dev",
+    "dev": "concurrently \"pnpm:dev:site\" \"pnpm:dev:backend\"",
+    "dev:site": "sst bind next dev",
+    "dev:backend": "sst dev",
+    "dev:backend:prod": "sst dev --stage production",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "deploy:prod": "sst deploy --stage production",
+    "db:push": "dotenv -e .env.local drizzle-kit push:pg",
+    "db:push:prod": "dotenv -e .env.production drizzle-kit push:pg",
+    "db:studio": "drizzle-kit studio",
+    "db:studio:prod": "dotenv -e .env.production drizzle-kit studio"
   },
   "dependencies": {
     "@types/node": "20.5.9",
     "@types/react": "18.2.21",
     "@types/react-dom": "18.2.7",
     "autoprefixer": "10.4.15",
+    "boolean": "^3.2.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
+    "dotenv": "^16.3.1",
+    "drizzle-orm": "^0.28.5",
     "eslint": "8.48.0",
     "eslint-config-next": "13.4.19",
     "lucide-react": "^0.274.0",
     "next": "13.4.19",
+    "ora": "^7.0.1",
+    "picocolors": "^1.0.0",
+    "pluralize": "^8.0.0",
     "postcss": "8.4.29",
+    "postgres": "^3.3.5",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "rss-parser": "^3.13.0",
     "tailwind-merge": "^1.14.0",
     "tailwindcss": "3.3.3",
     "tailwindcss-animate": "^1.0.7",
     "typescript": "5.2.2"
   },
   "devDependencies": {
-    "sst": "^2.24.23",
+    "@types/pluralize": "^0.0.30",
     "aws-cdk-lib": "2.94.0",
-    "constructs": "10.2.70"
+    "concurrently": "^8.2.1",
+    "constructs": "10.2.70",
+    "dotenv-cli": "^7.3.0",
+    "drizzle-kit": "^0.19.13",
+    "pg": "^8.11.3",
+    "sst": "^2.24.24"
   }
 }
