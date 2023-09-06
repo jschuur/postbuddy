@@ -40,6 +40,9 @@ export default async function updateFeeds() {
               publishedAt: item.pubDate,
               description: item.contentSnippet?.trim(),
               content: item.content?.trim(),
+              enclosureUrl: item.enclosure?.url,
+              enclosureType: item.enclosure?.type,
+              enclosureLength: item.enclosure?.length,
             });
         }
 

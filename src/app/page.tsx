@@ -1,6 +1,6 @@
 import pluralize from 'pluralize';
 
-import FeedEntries from '@/components/FeedEntries';
+import FeedEntries from '@/components/feedentry/FeedEntries';
 
 import { getFeedEntriesCount, getFeedsCount } from '@/db/queries';
 

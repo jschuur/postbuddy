@@ -8,7 +8,7 @@ import Header from '@/components/layout/Header';
 
 import { cn } from '@/lib/utils';
 
-const poppins = Poppins({ weight: ['400', '500', '600'], subsets: ['latin'] });
+const poppins = Poppins({ weight: ['300', '400', '500', '600'], subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'PostBuddy',
@@ -20,7 +20,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang='en'>
       <body className={cn('flex flex-col h-screen', poppins.className)}>
         <Header />
-        <main className='px-8 max-w-3xl grow'>{children}</main>
+        <main className='container mx-auto px-8 max-w-4xl grow'>{children}</main>
         <Footer />
       </body>
     </html>

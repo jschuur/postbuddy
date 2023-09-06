@@ -30,6 +30,7 @@ export const getRecentEntries = (limit: number = 100, offset: number = 0) =>
     .orderBy(desc(feedEntries.publishedAt))
     .limit(limit)
     .offset(offset)
+    .leftJoin(feeds, eq(feeds.id, feedEntries.feedId))
     .execute();
 
 export const addFeedEntry = (values: FeedEntryInsert) =>

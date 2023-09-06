@@ -5,11 +5,13 @@ export const feeds = pgTable('feeds', {
   id: serial('id').primaryKey(),
   name: text('name').notNull(),
   url: varchar('url').unique(),
+  siteUrl: varchar('siteUrl').unique(),
   active: boolean('active').notNull().default(true),
   lastUpdatedAt: text('lastUpdatedAt'),
 });
 
 export type FeedUpdate = Partial<InferSelectModel<typeof feeds>>;
+export type FeedSelect = InferSelectModel<typeof feeds>;
 
 // export const feedRelations = relations(feeds, ({ many }) => ({
 //   entries: many(feedEntries),
@@ -26,6 +28,9 @@ export const feedEntries = pgTable('feedEntries', {
   guid: varchar('guid').unique(),
   description: text('description'),
   content: text('content'),
+  enclosureUrl: text('enclosureUrl'),
+  enclosureType: text('enclosureType'),
+  enclosureLength: integer('enclosureLength'),
 });
 
 // export const feedEntryRelations = relations(feedEntries, ({ one }) => ({
