@@ -3,17 +3,19 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "concurrently \"pnpm:dev:site\" \"pnpm:dev:backend\"",
+    "dev": "concurrently \"pnpm:dev:site\" \"pnpm:dev:backend\" \"pnpm:db:studio\"",
     "dev:site": "sst bind next dev",
     "dev:backend": "sst dev",
     "dev:backend:prod": "sst dev --stage production",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "update:feeds": "dotenv -e .env.local tsx src/cli/update.ts",
+    "update:feeds:prod": "dotenv -e .env.production tsx src/cli/update.ts",
     "deploy:prod": "sst deploy --stage production",
     "db:push": "dotenv -e .env.local drizzle-kit push:pg",
     "db:push:prod": "dotenv -e .env.production drizzle-kit push:pg",
-    "db:studio": "drizzle-kit studio",
+    "db:studio": "dotenv -e .env.local drizzle-kit studio",
     "db:studio:prod": "dotenv -e .env.production drizzle-kit studio"
   },
   "dependencies": {
@@ -54,5 +56,6 @@
     "drizzle-kit": "^0.19.13",
     "pg": "^8.11.3",
     "sst": "^2.24.24"
+    "tsx": "^3.12.8"
   }
 }

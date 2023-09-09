@@ -1,6 +1,6 @@
 import 'dotenv/config';
 
-import updateFeeds from '../rss/updateFeeds';
+import updateFeeds from '@/rss/updateFeeds';
 
 (async () => {
   await updateFeeds();
