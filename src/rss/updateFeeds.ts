@@ -37,7 +37,7 @@ export default async function updateFeeds() {
               url: item.link,
               feedId: feed.id,
               guid: item.guid || item.link,
-              publishedAt: item.pubDate,
+              publishedAt: new Date(item.pubDate!),
               description: item.contentSnippet?.trim(),
               content: item.content?.trim(),
               enclosureUrl: item.enclosure?.url,
@@ -46,7 +46,7 @@ export default async function updateFeeds() {
             });
         }
 
-        await updateFeed(feed.id, { lastUpdatedAt: new Date().toISOString() });
+        await updateFeed(feed.id, { lastUpdatedAt: new Date() });
 
         spinner.succeed('  added items');
       } catch (err) {

@@ -2,8 +2,13 @@ import FeedEntry from '@/components/feedentry/FeedEntry';
 
 import { getRecentEntries } from '@/db/queries';
 
+import { DEFAULT_ITEM_LIST_LIMIT } from '@/config';
+
 export default async function FeedList() {
-  const feedEntries = await getRecentEntries();
+  const feedEntries = await getRecentEntries({
+    limit: DEFAULT_ITEM_LIST_LIMIT,
+    includeSeen: false,
+  });
 
   return (
     <div className='grid grid-cols-[1fr_200px)]'>

@@ -8,27 +8,37 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import pluralize from 'pluralize';
 
-import { getFeeds } from '@/db/queries';
+import { cn } from '@/lib/utils';
+
+import { getFeedsWithDetails } from '@/db/queries';
 
 export default async function FeedList() {
-  const feeds = await getFeeds();
+  const feeds = await getFeedsWithDetails();
+  const feedCount = feeds.length;
+  const feedCountActive = feeds.filter((feed) => feed.active).length;
 
   return (
     <Table>
-      <TableCaption>A list of your recent invoices.</TableCaption>
+      <TableCaption className='text-gray-600 font-light'>
+        {pluralize('feed', feedCount, true)}
+        {feedCount !== feedCountActive ? ` (${feedCountActive} active)` : null}
+      </TableCaption>
       <TableHeader>
         <TableRow className='font-medium'>
           <TableHead className=''>Name</TableHead>
-          <TableHead className='text-right'>Last Updated</TableHead>
+          <TableHead className='text-right'>Items</TableHead>
+          <TableHead className='text-right'>Last Refreshed</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {feeds.map((feed) => (
-          <TableRow key={feed.id}>
+          <TableRow key={feed.id} className={cn(feed.active ? '' : 'text-gray-300')}>
             <TableCell className='font-medium'>
-              {<a href={feed.url || ''}>{feed.name}</a>}
+              {<a href={feed.siteUrl || ''}>{feed.name}</a>}
             </TableCell>
+            <TableCell className='text-right'>{feed.entryCount}</TableCell>
             <TableCell className='text-right'>
               <FormattedDate date={feed.lastUpdatedAt} />
             </TableCell>

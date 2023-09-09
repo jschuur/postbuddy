@@ -2,6 +2,8 @@ import { desc, eq, sql } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 
+import { DEFAULT_ITEM_LIST_LIMIT } from '@/config';
+
 import { FeedEntryInsert, FeedUpdate, feedEntries, feeds } from './schema';
 
 const connectionString = process.env.DB_URL;
@@ -14,6 +16,22 @@ const db = drizzle(client);
 export const getFeeds = () => db.select().from(feeds);
 export const getActiveFeeds = () => db.select().from(feeds).where(eq(feeds.active, true));
 
+export const getFeedsWithDetails = () =>
+  db
+    .select({
+      id: feeds.id,
+      name: feeds.name,
+      siteUrl: feeds.siteUrl,
+      active: feeds.active,
+      lastUpdatedAt: feeds.lastUpdatedAt,
+      entryCount: sql<number>`count(${feedEntries.id})`,
+    })
+    .from(feedEntries)
+    .leftJoin(feeds, eq(feeds.id, feedEntries.feedId))
+    .groupBy(feeds.id)
+    // .orderBy(desc(feedEntries.publishedAt))
+    .execute();
+
 export const getFeedsCount = () =>
   db
     .select({ count: sql<number>`count(*)` })
@@ -23,10 +41,19 @@ export const getFeedsCount = () =>
 export const updateFeed = (feedId: number, set: FeedUpdate) =>
   db.update(feeds).set(set).where(eq(feeds.id, feedId));
 
-export const getRecentEntries = (limit: number = 100, offset: number = 0) =>
+export const getRecentEntries = ({
+  limit = DEFAULT_ITEM_LIST_LIMIT,
+  offset = 0,
+  includeSeen = true,
+}: {
+  limit?: number;
+  offset?: number;
+  includeSeen?: boolean;
+}) =>
   db
     .select()
     .from(feedEntries)
+    .where(includeSeen ? sql`true` : eq(feedEntries.seen, false))
     .orderBy(desc(feedEntries.publishedAt))
     .limit(limit)
     .offset(offset)

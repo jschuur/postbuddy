@@ -1,5 +1,5 @@
 import { InferInsertModel, InferSelectModel } from 'drizzle-orm';
-import { boolean, integer, pgTable, serial, text, varchar } from 'drizzle-orm/pg-core';
+import { boolean, integer, pgTable, serial, text, timestamp, varchar } from 'drizzle-orm/pg-core';
 
 export const feeds = pgTable('feeds', {
   id: serial('id').primaryKey(),
@@ -7,7 +7,7 @@ export const feeds = pgTable('feeds', {
   url: varchar('url').unique(),
   siteUrl: varchar('siteUrl').unique(),
   active: boolean('active').notNull().default(true),
-  lastUpdatedAt: text('lastUpdatedAt'),
+  lastUpdatedAt: timestamp('lastUpdatedAt'),
 });
 
 export type FeedUpdate = Partial<InferSelectModel<typeof feeds>>;
@@ -24,13 +24,14 @@ export const feedEntries = pgTable('feedEntries', {
     .references(() => feeds.id),
   title: varchar('title'),
   url: varchar('url').unique(),
-  publishedAt: text('publishedAt'),
+  publishedAt: timestamp('publishedAt'),
   guid: varchar('guid').unique(),
   description: text('description'),
   content: text('content'),
   enclosureUrl: text('enclosureUrl'),
   enclosureType: text('enclosureType'),
   enclosureLength: integer('enclosureLength'),
+  seen: boolean('seen').notNull().default(false),
 });
 
 // export const feedEntryRelations = relations(feedEntries, ({ one }) => ({
