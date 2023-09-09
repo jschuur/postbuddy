@@ -1,0 +1,1 @@
+export const DEFAULT_ITEM_ENCLOSURE_WIDTH = 240;
