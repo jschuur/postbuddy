@@ -29,8 +29,8 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
     "dotenv": "^16.3.1",
-    "drizzle-orm": "^0.28.5",
-    "eslint": "8.48.0",
+    "drizzle-orm": "^0.28.6",
+    "eslint": "8.49.0",
     "eslint-config-next": "13.4.19",
     "lucide-react": "^0.274.0",
     "next": "13.4.19",
@@ -55,7 +55,7 @@
     "dotenv-cli": "^7.3.0",
     "drizzle-kit": "^0.19.13",
     "pg": "^8.11.3",
-    "sst": "^2.24.24"
+    "sst": "^2.24.26",
     "tsx": "^3.12.8"
   }
 }
