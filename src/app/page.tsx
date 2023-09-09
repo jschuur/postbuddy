@@ -4,10 +4,12 @@ import FeedEntries from '@/components/feedentry/FeedEntries';
 
 import { getFeedEntriesCount, getFeedsCount } from '@/db/queries';
 
-const feedEntriesCount = await getFeedEntriesCount();
-const feedsCount = await getFeedsCount();
+export const revalidate = 0;
 
-export default function Home() {
+export default async function Home() {
+  const feedEntriesCount = await getFeedEntriesCount();
+  const feedsCount = await getFeedsCount();
+
   return (
     <>
       <p className='py-4'>
