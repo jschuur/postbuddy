@@ -1,20 +1,11 @@
-import FeedEntry from '@/components/feedentry/FeedEntry';
+import FeedEntriesList from './FeedEntriesList';
+import FeedEntriesStats from './FeedEntriesStats';
 
-import { getRecentEntries } from '@/db/queries';
-
-import { DEFAULT_ITEM_LIST_LIMIT } from '@/config';
-
-export default async function FeedList() {
-  const feedEntries = await getRecentEntries({
-    limit: DEFAULT_ITEM_LIST_LIMIT,
-    includeSeen: false,
-  });
-
+export default function FeedEntries() {
   return (
-    <div className='grid grid-cols-[1fr_200px)]'>
-      {feedEntries.map(({ feedEntries: entry, feeds: feed }) => (
-        <FeedEntry key={entry.guid} entry={entry} feed={feed!} />
-      ))}
-    </div>
+    <>
+      <FeedEntriesStats />
+      <FeedEntriesList />
+    </>
   );
 }
