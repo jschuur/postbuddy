@@ -5,38 +5,31 @@ export const feeds = pgTable('feeds', {
   id: serial('id').primaryKey(),
   name: text('name').notNull(),
   url: varchar('url').unique(),
-  siteUrl: varchar('siteUrl').unique(),
+  siteUrl: varchar('site_url').unique(),
   active: boolean('active').notNull().default(true),
-  lastUpdatedAt: timestamp('lastUpdatedAt'),
+  lastCheckedAt: timestamp('last_checked_at'),
+  lastPublishedAt: timestamp('last_published_at'),
 });
 
 export type FeedUpdate = Partial<InferSelectModel<typeof feeds>>;
 export type FeedSelect = InferSelectModel<typeof feeds>;
 
-// export const feedRelations = relations(feeds, ({ many }) => ({
-//   entries: many(feedEntries),
-// }));
-
-export const feedEntries = pgTable('feedEntries', {
+export const feedItems = pgTable('feed_items', {
   id: serial('id').primaryKey(),
-  feedId: integer('feedId')
+  feedId: integer('feed_id')
     .notNull()
     .references(() => feeds.id),
   title: varchar('title'),
   url: varchar('url').unique(),
-  publishedAt: timestamp('publishedAt'),
+  publishedAt: timestamp('published_at'),
   guid: varchar('guid').unique(),
   description: text('description'),
   content: text('content'),
-  enclosureUrl: text('enclosureUrl'),
-  enclosureType: text('enclosureType'),
-  enclosureLength: integer('enclosureLength'),
+  enclosureUrl: text('enclosure_url'),
+  enclosureType: text('enclosure_type'),
+  enclosureLength: integer('enclosure_length'),
   seen: boolean('seen').notNull().default(false),
 });
 
-// export const feedEntryRelations = relations(feedEntries, ({ one }) => ({
-//   feed: one(feeds, { fields: [feedEntries.feedId], references: [feeds.id], relationName: 'feed' }),
-// }));
-
-export type FeedEntryInsert = InferInsertModel<typeof feedEntries>;
-export type FeedEntrySelect = InferSelectModel<typeof feedEntries>;
+export type FeedItemInsert = InferInsertModel<typeof feedItems>;
+export type FeedItemSelect = InferSelectModel<typeof feedItems>;

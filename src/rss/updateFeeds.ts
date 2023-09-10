@@ -1,41 +1,59 @@
-import ora from 'ora';
+import pLimit from 'p-limit';
 import pluralize from 'pluralize';
+import prettyMilliseconds from 'pretty-ms';
 import Parser from 'rss-parser';
 
+import { CONCURRENT_FEED_UPDATES } from '@/config';
+
+import {
+  addFeedItem,
+  getActiveFeeds,
+  getLastFeedItemId,
+  updateFeed,
+  updateFeedsLastPublishedAt,
+} from '@/db/queries';
+import { FeedSelect } from '@/db/schema';
 import { getErrorMessage } from '@/lib/utils';
-import { addFeedEntry, getActiveFeeds, updateFeed } from '../db/queries';
 
 const parser = new Parser();
 
-export default async function updateFeeds() {
-  const feeds = await getActiveFeeds();
-  let spinner;
+let feedsRemaining: number;
 
-  console.log(`Found ${pluralize('feed', feeds.length, true)}\n`);
+async function updateOneFeed({
+  feed,
+  lastFeedItemId,
+}: {
+  feed: FeedSelect;
+  lastFeedItemId: number;
+}) {
+  const { name, url: feedUrl, id: feedId } = feed;
 
-  for (const feed of feeds) {
-    console.log(`${feed.name} (${feed.url})`);
+  const log = (str: string) => console.log(`[${name}] ${str}`);
+
+  if (!feedUrl) {
+    log(`skipped (no feed URL)`);
+  } else {
+    log(`checking ${feedUrl}`);
 
     try {
-      if (!feed.url) {
-        console.log(`  skipping (no feed URL)`);
-        continue;
-      }
+      const feedResult = await parser.parseURL(feedUrl);
+      log(
+        `feed contained ${pluralize(
+          'item',
+          feedResult.items.length,
+          true
+        )}, attempting to add new ones`
+      );
 
-      spinner = ora(`  fetching items`).start();
-
-      const feedResult = await parser.parseURL(feed.url);
-      spinner.succeed(`  found ${pluralize('item', feedResult.items.length, true)}`);
-
-      spinner = ora(`  adding items`).start();
       try {
+        let itemsAdded = 0;
+
         for (const item of feedResult.items) {
-          if (item.link)
-            // TODO: maintain updatedAt field
-            await addFeedEntry({
+          if (item.link) {
+            const [returningItem] = await addFeedItem({
               title: item.title || '[unknown title]',
               url: item.link,
-              feedId: feed.id,
+              feedId,
               guid: item.guid || item.link,
               publishedAt: new Date(item.pubDate!),
               description: item.contentSnippet?.trim(),
@@ -44,16 +62,59 @@ export default async function updateFeeds() {
               enclosureType: item.enclosure?.type,
               enclosureLength: item.enclosure?.length,
             });
+
+            if (returningItem.id > lastFeedItemId) {
+              itemsAdded++;
+
+              log(`added '${returningItem.title}'`);
+            }
+          }
         }
 
-        await updateFeed(feed.id, { lastUpdatedAt: new Date() });
+        await updateFeed(feedId, { lastCheckedAt: new Date() });
 
-        spinner.succeed('  added items');
+        log(
+          `check completed, ${
+            itemsAdded ? `(${pluralize('new item', itemsAdded, true)})` : 'no new items'
+          }`
+        );
       } catch (err) {
-        spinner?.fail(`Error adding feed entry: ${getErrorMessage(err)})`);
+        log(`error adding feed item: ${getErrorMessage(err)})`);
       }
     } catch (err) {
-      spinner?.fail(`Error querying feed ${feed.url}: ${getErrorMessage(err)}}`);
+      log(`error checking feed: ${getErrorMessage(err)}`);
     }
   }
+
+  feedsRemaining--;
+
+  if (feedsRemaining > 0) console.log(`${feedsRemaining} feeds still updating`);
+}
+
+export default async function updateFeeds() {
+  const startTime = new Date();
+
+  console.log('START: updating feeds');
+
+  const feeds = await getActiveFeeds();
+  feedsRemaining = feeds.length;
+
+  const lastFeedItemId = await getLastFeedItemId();
+  const limit = pLimit(CONCURRENT_FEED_UPDATES);
+
+  console.log(
+    `Found ${pluralize(
+      'active feed',
+      feeds.length,
+      true
+    )}, updating ${CONCURRENT_FEED_UPDATES} at a time`
+  );
+
+  await Promise.all(feeds.map((feed) => limit(() => updateOneFeed({ feed, lastFeedItemId }))));
+
+  await updateFeedsLastPublishedAt();
+
+  console.log(
+    `END: feeds updated (${prettyMilliseconds(new Date().getTime() - startTime.getTime())})`
+  );
 }

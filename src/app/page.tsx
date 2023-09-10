@@ -1,7 +1,7 @@
-import FeedEntries from '@/components/feedentry/FeedEntries';
+import FeedItems from '@/components/feeditems/FeedItems';
 
 export const revalidate = 0;
 
 export default async function Home() {
-  return <FeedEntries />;
+  return <FeedItems />;
 }

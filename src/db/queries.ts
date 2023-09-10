@@ -4,14 +4,14 @@ import postgres from 'postgres';
 
 import { DEFAULT_ITEM_LIST_LIMIT } from '@/config';
 
-import { FeedEntryInsert, FeedUpdate, feedEntries, feeds } from './schema';
+import { FeedItemInsert, FeedUpdate, feedItems, feeds } from './schema';
 
 const connectionString = process.env.DB_URL;
 
 if (!connectionString) throw new Error('DB_URL not set');
 
 const client = postgres(connectionString);
-const db = drizzle(client);
+export const db = drizzle(client);
 
 export const getFeeds = () => db.select().from(feeds);
 export const getActiveFeeds = () => db.select().from(feeds).where(eq(feeds.active, true));
@@ -23,16 +23,17 @@ export const getFeedsWithDetails = () =>
       name: feeds.name,
       siteUrl: feeds.siteUrl,
       active: feeds.active,
-      lastUpdatedAt: feeds.lastUpdatedAt,
-      entryCount: sql<number>`count(${feedEntries.id})`,
+      lastCheckedAt: feeds.lastCheckedAt,
+      lastPublishedAt: feeds.lastPublishedAt,
+      feedItemCount: sql<number>`count(${feedItems.id})`,
     })
-    .from(feedEntries)
-    .leftJoin(feeds, eq(feeds.id, feedEntries.feedId))
+    .from(feedItems)
+    .leftJoin(feeds, eq(feeds.id, feedItems.feedId))
     .groupBy(feeds.id)
-    // .orderBy(desc(feedEntries.publishedAt))
+    // .orderBy(desc(feedItems.publishedAt))
     .execute();
 
-export const getFeedsCount = () =>
+export const getFeedCount = () =>
   db
     .select({ count: sql<number>`count(*)` })
     .from(feeds)
@@ -41,7 +42,7 @@ export const getFeedsCount = () =>
 export const updateFeed = (feedId: number, set: FeedUpdate) =>
   db.update(feeds).set(set).where(eq(feeds.id, feedId));
 
-export const getRecentEntries = ({
+export const getRecentFeedItems = ({
   limit = DEFAULT_ITEM_LIST_LIMIT,
   offset = 0,
   includeSeen = true,
@@ -52,22 +53,40 @@ export const getRecentEntries = ({
 }) =>
   db
     .select()
-    .from(feedEntries)
-    .where(includeSeen ? sql`true` : eq(feedEntries.seen, false))
-    .orderBy(desc(feedEntries.publishedAt))
+    .from(feedItems)
+    .where(includeSeen ? sql`true` : eq(feedItems.seen, false))
+    .orderBy(desc(feedItems.publishedAt))
     .limit(limit)
     .offset(offset)
-    .leftJoin(feeds, eq(feeds.id, feedEntries.feedId))
+    .leftJoin(feeds, eq(feeds.id, feedItems.feedId))
     .execute();
 
-export const addFeedEntry = (values: FeedEntryInsert) =>
+export const addFeedItem = (values: FeedItemInsert) =>
   db
-    .insert(feedEntries)
+    .insert(feedItems)
     .values(values)
-    .onConflictDoUpdate({ target: feedEntries.url, set: values });
+    .onConflictDoUpdate({ target: feedItems.url, set: values })
+    .returning();
 
-export const getFeedEntriesCount = () =>
+export const getLastFeedItemId = () =>
+  db
+    .select()
+    .from(feedItems)
+    .orderBy(desc(feedItems.id))
+    .limit(1)
+    .then((res) => res[0]?.id);
+
+export const getFeedItemCount = () =>
   db
     .select({ count: sql<number>`count(*)` })
-    .from(feedEntries)
+    .from(feedItems)
     .then((res) => res[0].count);
+
+export const updateFeedsLastPublishedAt = () =>
+  db.execute(sql`
+      UPDATE feeds AS f
+        SET last_published_at = (
+          SELECT MAX(fi.published_at)
+          FROM feed_items AS fi
+          WHERE fi.feed_id = f.id
+        );`);

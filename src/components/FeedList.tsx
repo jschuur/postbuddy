@@ -29,18 +29,26 @@ export default async function FeedList() {
         <TableRow className='font-medium'>
           <TableHead className=''>Name</TableHead>
           <TableHead className='text-right'>Items</TableHead>
-          <TableHead className='text-right'>Last Refreshed</TableHead>
+          <TableHead className='text-right'>Last Checked</TableHead>
+          <TableHead className='text-right'>Last Published</TableHead>
         </TableRow>
       </TableHeader>
-      <TableBody>
+      <TableBody className='text-sm'>
         {feeds.map((feed) => (
           <TableRow key={feed.id} className={cn(feed.active ? '' : 'text-gray-300')}>
             <TableCell className='font-medium'>
               {<a href={feed.siteUrl || ''}>{feed.name}</a>}
             </TableCell>
-            <TableCell className='text-right'>{feed.entryCount}</TableCell>
+            <TableCell className='text-right'>{feed.feedItemCount}</TableCell>
             <TableCell className='text-right'>
-              <FormattedDate date={feed.lastUpdatedAt} />
+              <span className='whitespace-nowrap'>
+                <FormattedDate date={feed.lastCheckedAt} />
+              </span>
+            </TableCell>
+            <TableCell className='text-right'>
+              <span className='whitespace-nowrap'>
+                <FormattedDate date={feed.lastPublishedAt} />
+              </span>
             </TableCell>
           </TableRow>
         ))}
