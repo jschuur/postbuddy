@@ -10,12 +10,12 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "update:feeds": "dotenv -e .env.local tsx src/cli/update.ts",
+    "update:feeds": "dotenv -e .env.joostschuur tsx src/cli/update.ts",
     "update:feeds:prod": "dotenv -e .env.production tsx src/cli/update.ts",
     "deploy:prod": "sst deploy --stage production",
-    "db:push": "dotenv -e .env.local drizzle-kit push:pg",
+    "db:push": "dotenv -e .env.joostschuur drizzle-kit push:pg",
     "db:push:prod": "dotenv -e .env.production drizzle-kit push:pg",
-    "db:studio": "dotenv -e .env.local drizzle-kit studio",
+    "db:studio": "dotenv -e .env.joostschuur drizzle-kit studio",
     "db:studio:prod": "dotenv -e .env.production drizzle-kit studio"
   },
   "dependencies": {
