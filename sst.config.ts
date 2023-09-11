@@ -36,6 +36,7 @@ export default {
         job: {
           function: {
             handler: 'src/functions/update.handler',
+            timeout: 900,
             environment: {
               DB_URL: process.env.DB_URL,
             },
