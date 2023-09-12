@@ -15,7 +15,10 @@ export default function LastSeen({ date }: { date: Date | string | null }) {
           <span>{formatDistanceToNowStrict(dateObj, { addSuffix: true })}</span>
         </TooltipTrigger>
         <TooltipContent className='bg-zinc-50'>
-          <p className='text-xs'>{format(dateObj, 'PPPPpppp')}</p>
+          <p className='text-xs'>
+            <div>{format(dateObj, 'PPPP')}</div>
+            <div>at {format(dateObj, 'pppp')}</div>
+          </p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

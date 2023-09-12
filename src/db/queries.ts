@@ -27,7 +27,7 @@ export const getFeedsWithDetails = () =>
       lastPublishedAt: feeds.lastPublishedAt,
       lastErrorAt: feeds.lastErrorAt,
       lastErrorMessage: feeds.lastErrorMessage,
-      feedItemCount: sql<number>`count(${feedItems.id})`,
+      itemCount: sql<number>`count(${feedItems.id})`,
     })
     .from(feedItems)
     .leftJoin(feeds, eq(feeds.id, feedItems.feedId))
