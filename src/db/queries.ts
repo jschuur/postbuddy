@@ -25,6 +25,8 @@ export const getFeedsWithDetails = () =>
       active: feeds.active,
       lastCheckedAt: feeds.lastCheckedAt,
       lastPublishedAt: feeds.lastPublishedAt,
+      lastErrorAt: feeds.lastErrorAt,
+      lastErrorMessage: feeds.lastErrorMessage,
       feedItemCount: sql<number>`count(${feedItems.id})`,
     })
     .from(feedItems)

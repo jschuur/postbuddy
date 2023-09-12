@@ -9,6 +9,9 @@ export const feeds = pgTable('feeds', {
   active: boolean('active').notNull().default(true),
   lastCheckedAt: timestamp('last_checked_at'),
   lastPublishedAt: timestamp('last_published_at'),
+  errorCount: integer('error_count').notNull().default(0),
+  lastErrorAt: timestamp('last_error_at'),
+  lastErrorMessage: text('last_error_message'),
 });
 
 export type FeedUpdate = Partial<InferSelectModel<typeof feeds>>;
@@ -27,7 +30,6 @@ export const feedItems = pgTable('feed_items', {
   content: text('content'),
   enclosureUrl: text('enclosure_url'),
   enclosureType: text('enclosure_type'),
-  enclosureLength: integer('enclosure_length'),
   seen: boolean('seen').notNull().default(false),
 });
 

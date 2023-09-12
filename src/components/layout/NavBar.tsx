@@ -9,6 +9,12 @@ export default function MainNav({ className, ...props }: React.HTMLAttributes<HT
         PostBuddy
       </Link>
       <Link
+        href='/items'
+        className='text-medium font-medium text-muted-foreground transition-colors hover:text-primary'
+      >
+        Items
+      </Link>
+      <Link
         href='/feeds'
         className='text-medium font-medium text-muted-foreground transition-colors hover:text-primary'
       >

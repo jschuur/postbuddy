@@ -3,7 +3,7 @@ import pluralize from 'pluralize';
 import prettyMilliseconds from 'pretty-ms';
 import Parser from 'rss-parser';
 
-import { CONCURRENT_FEED_UPDATES } from '@/config';
+import { CONCURRENT_FEED_UPDATES, DEFAULT_FEED_ITEM_TITLE } from '@/config';
 
 import {
   addFeedItem,
@@ -13,11 +13,27 @@ import {
   updateFeedsLastPublishedAt,
 } from '@/db/queries';
 import { FeedSelect } from '@/db/schema';
-import { getErrorMessage } from '@/lib/utils';
+import { dateOrNull, getErrorMessage } from '@/lib/utils';
 
 const parser = new Parser();
 
 let feedsRemaining: number;
+let totalItemsAdded: number;
+let totalErrors: number;
+
+async function logError({ type, err, feed }: { type: string; err: unknown; feed: FeedSelect }) {
+  const errorMessage = getErrorMessage(err);
+
+  console.log(`[${feed.name}] ${type} error: ${errorMessage}`);
+
+  await updateFeed(feed.id, {
+    errorCount: feed.errorCount + 1,
+    lastErrorAt: new Date(),
+    lastErrorMessage: `[${type}] ${errorMessage}`,
+  });
+
+  totalErrors++;
+}
 
 async function updateOneFeed({
   feed,
@@ -37,6 +53,7 @@ async function updateOneFeed({
 
     try {
       const feedResult = await parser.parseURL(feedUrl);
+
       log(
         `feed contained ${pluralize(
           'item',
@@ -50,23 +67,27 @@ async function updateOneFeed({
 
         for (const item of feedResult.items) {
           if (item.link) {
-            const [returningItem] = await addFeedItem({
-              title: item.title || '[unknown title]',
-              url: item.link,
-              feedId,
-              guid: item.guid || item.link,
-              publishedAt: new Date(item.pubDate!),
-              description: item.contentSnippet?.trim(),
-              content: item.content?.trim(),
-              enclosureUrl: item.enclosure?.url,
-              enclosureType: item.enclosure?.type,
-              enclosureLength: item.enclosure?.length,
-            });
+            try {
+              const [returningItem] = await addFeedItem({
+                title: item.title?.trim() || DEFAULT_FEED_ITEM_TITLE,
+                url: item.link,
+                feedId,
+                guid: item.guid || item.link,
+                publishedAt: item.pubDate ? dateOrNull(item.pubDate) : null,
+                description: item.contentSnippet?.trim(),
+                content: item.content?.trim(),
+                enclosureUrl: item.enclosure?.url,
+                enclosureType: item.enclosure?.type,
+              });
 
-            if (returningItem.id > lastFeedItemId) {
-              itemsAdded++;
+              if (returningItem.id > lastFeedItemId) {
+                itemsAdded++;
+                totalItemsAdded++;
 
-              log(`added '${returningItem.title}'`);
+                log(`added '${returningItem.title}'`);
+              }
+            } catch (err) {
+              await logError({ type: 'addFeedItem', err, feed });
             }
           }
         }
@@ -79,10 +100,10 @@ async function updateOneFeed({
           }`
         );
       } catch (err) {
-        log(`error adding feed item: ${getErrorMessage(err)})`);
+        await logError({ type: 'updateFeed', err, feed });
       }
     } catch (err) {
-      log(`error checking feed: ${getErrorMessage(err)}`);
+      await logError({ type: 'parseURL', err, feed });
     }
   }
 
@@ -93,6 +114,9 @@ async function updateOneFeed({
 
 export default async function updateFeeds() {
   const startTime = new Date();
+
+  totalItemsAdded = 0;
+  totalErrors = 0;
 
   console.log('START: updating feeds');
 
@@ -115,6 +139,10 @@ export default async function updateFeeds() {
   await updateFeedsLastPublishedAt();
 
   console.log(
-    `END: feeds updated (${prettyMilliseconds(new Date().getTime() - startTime.getTime())})`
+    `END: feeds updated${
+      totalItemsAdded > 0 ? `, ${pluralize('total item', totalItemsAdded, true)} added` : ''
+    } ${
+      totalErrors > 0 ? `, ${pluralize('total error', totalErrors, true)}` : ''
+    } (${prettyMilliseconds(new Date().getTime() - startTime.getTime())})`
   );
 }

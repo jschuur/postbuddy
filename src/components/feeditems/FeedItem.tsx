@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 import { DEFAULT_ITEM_ENCLOSURE_WIDTH } from '@/config';
 
 import CDNImage from '@/components/CDNImage';
-import FormattedDate from '@/components/FormattedDate';
+import TimeAgo from '@/components/TimeAgo';
 
 import { FeedItemSelect, FeedSelect } from '@/db/schema';
 
@@ -19,7 +19,11 @@ export default function FeedItem({ item, feed }: { item: FeedItemSelect; feed: F
       <div className='col-span-2 border-b-[1px] border-gray-500'>
         <a href={item.url || '#'}>{item.title}</a>
         <p className='text-xs font-light text-gray-400'>
-          <FormattedDate date={item.publishedAt} />,{' '}
+          {item.publishedAt && (
+            <>
+              <TimeAgo date={item.publishedAt} />,{' '}
+            </>
+          )}
           <a href={feed.siteUrl || feed.url || '#'}>{feed.name}</a>
         </p>
       </div>

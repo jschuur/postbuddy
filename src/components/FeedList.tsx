@@ -1,4 +1,4 @@
-import FormattedDate from '@/components/FormattedDate';
+import TimeAgo from '@/components/TimeAgo';
 import {
   Table,
   TableBody,
@@ -26,29 +26,34 @@ export default async function FeedList() {
         {feedCount !== feedCountActive ? ` (${feedCountActive} active)` : null}
       </TableCaption>
       <TableHeader>
-        <TableRow className='font-medium'>
-          <TableHead className=''>Name</TableHead>
+        <TableRow>
+          <TableHead>Name</TableHead>
           <TableHead className='text-right'>Items</TableHead>
-          <TableHead className='text-right'>Last Checked</TableHead>
-          <TableHead className='text-right'>Last Published</TableHead>
+          <TableHead className='text-right whitespace-nowrap'>Last Checked</TableHead>
+          <TableHead className='text-right whitespace-nowrap'>Last Published</TableHead>
+          <TableHead className='whitespace-nowrap'>Last Error</TableHead>
         </TableRow>
       </TableHeader>
-      <TableBody className='text-sm'>
+      <TableBody className='text-xs'>
         {feeds.map((feed) => (
           <TableRow key={feed.id} className={cn(feed.active ? '' : 'text-gray-300')}>
-            <TableCell className='font-medium'>
+            <TableCell className='align-top'>
               {<a href={feed.siteUrl || ''}>{feed.name}</a>}
             </TableCell>
-            <TableCell className='text-right'>{feed.feedItemCount}</TableCell>
-            <TableCell className='text-right'>
-              <span className='whitespace-nowrap'>
-                <FormattedDate date={feed.lastCheckedAt} />
-              </span>
+            <TableCell className='text-right align-top'>{feed.feedItemCount}</TableCell>
+            <TableCell className='text-right align-top'>
+              <TimeAgo date={feed.lastCheckedAt} />
             </TableCell>
-            <TableCell className='text-right'>
-              <span className='whitespace-nowrap'>
-                <FormattedDate date={feed.lastPublishedAt} />
-              </span>
+            <TableCell className='text-right align-top'>
+              <TimeAgo date={feed.lastPublishedAt} />
+            </TableCell>
+            <TableCell className='align-top'>
+              {feed.lastErrorAt && (
+                <div className='pb-2'>
+                  <TimeAgo date={feed.lastErrorAt} />
+                </div>
+              )}
+              {feed.lastErrorMessage && <div className='text-xs'>{feed.lastErrorMessage}</div>}
             </TableCell>
           </TableRow>
         ))}

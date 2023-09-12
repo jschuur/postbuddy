@@ -10,3 +10,6 @@ export function getErrorMessage(error: unknown) {
 
   return String(error);
 }
+
+export const dateOrNull = (d: string) =>
+  new Date(d).toString() !== 'Invalid Date' ? new Date(d) : null;
