@@ -3,12 +3,18 @@
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { format, formatDistanceToNowStrict } from 'date-fns';
 
-export default function LastSeen({ date }: { date: Date | string | null }) {
+export default function TimeAgo({
+  date,
+  toolTip = false,
+}: {
+  date: Date | string | null;
+  toolTip?: boolean;
+}) {
   const dateObj = typeof date === 'string' ? new Date(date) : date;
 
   if (!dateObj) return null;
 
-  return (
+  return toolTip ? (
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
@@ -22,5 +28,7 @@ export default function LastSeen({ date }: { date: Date | string | null }) {
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
+  ) : (
+    formatDistanceToNowStrict(dateObj, { addSuffix: true })
   );
 }

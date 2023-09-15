@@ -2,8 +2,10 @@
 
 import { ColumnDef } from '@tanstack/react-table';
 
-import TimeAgo from '@/components/TimeAgo';
 import { DataTableColumnHeader } from '@/components/ui/datatable/DataTableColumnHeader';
+
+import TimeAgo from '@/components/TimeAgo';
+import FeedListRowActions from '@/components/feeds/FeedListRowActions';
 
 export type FeedList = {
   name: string | null;
@@ -65,7 +67,7 @@ export const columns: ColumnDef<FeedList>[] = [
     cell: ({ row }) => {
       return (
         <div className='text-left'>
-          <TimeAgo date={row.getValue('lastPublishedAt')} />
+          <TimeAgo date={row.getValue('lastPublishedAt')} toolTip />
         </div>
       );
     },
@@ -91,6 +93,13 @@ export const columns: ColumnDef<FeedList>[] = [
           )}
         </div>
       );
+    },
+  },
+  {
+    accessorKey: 'action',
+    header: '',
+    cell: ({ row }) => {
+      return <FeedListRowActions name={row.getValue('name')} />;
     },
   },
 ];

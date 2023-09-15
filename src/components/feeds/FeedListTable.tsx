@@ -11,13 +11,16 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
+import { PlusCircle } from 'lucide-react';
 import { useState } from 'react';
 
+import { Button } from '@/components/ui/button';
 import DataTablePagination from '@/components/ui/datatable/DataTablePagination';
 import { Input } from '@/components/ui/input';
 import {
   Table,
   TableBody,
+  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -30,6 +33,7 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
 }
+
 export default function FeedListTable<TData, TValue>({
   columns,
   data,
@@ -39,6 +43,7 @@ export default function FeedListTable<TData, TValue>({
 
   const [columnVisibility] = useState<VisibilityState>({
     siteUrl: false,
+    lastCheckedAt: false,
     lastErrorMessage: false,
     active: false,
   });
@@ -58,6 +63,10 @@ export default function FeedListTable<TData, TValue>({
     },
   });
 
+  const totalFeedCount = data.length;
+  const currentFeedCount = table.getRowModel().rows.length;
+  // const activeFeedCount =
+
   return (
     <div>
       <div className='flex items-center py-4'>
@@ -67,9 +76,17 @@ export default function FeedListTable<TData, TValue>({
           onChange={(event) => table.getColumn('name')?.setFilterValue(event.target.value)}
           className='max-w-sm'
         />
+        <Button variant='outline' size='default' className='ml-auto'>
+          <PlusCircle className='h-4 w-4 mr-2' />
+          Add Feed
+        </Button>
       </div>
       <div className='rounded-md border'>
         <Table>
+          <TableCaption>
+            Total feeds: {totalFeedCount}
+            {totalFeedCount !== currentFeedCount ? ` (${currentFeedCount} listed)` : ''}
+          </TableCaption>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
