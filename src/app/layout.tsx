@@ -3,8 +3,11 @@ import { Poppins } from 'next/font/google';
 
 import './globals.css';
 
+import { Toaster } from '@/components/ui/toaster';
+
 import Footer from '@/components/layout/Footer';
 import Header from '@/components/layout/Header';
+import Providers from './providers';
 
 import { cn } from '@/lib/utils';
 
@@ -19,9 +22,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang='en'>
       <body className={cn('flex flex-col h-screen', poppins.className)}>
-        <Header />
-        <main className='container mx-auto px-8 max-w-4xl grow'>{children}</main>
-        <Footer />
+        <Providers>
+          <Header />
+          <main className='container mx-auto px-8 max-w-4xl grow'>{children}</main>
+          <Footer />
+          <Toaster />
+        </Providers>
       </body>
     </html>
   );

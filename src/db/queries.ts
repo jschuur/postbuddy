@@ -22,6 +22,7 @@ export const getFeedsWithDetails = () =>
       id: feeds.id,
       name: feeds.name,
       siteUrl: feeds.siteUrl,
+      url: feeds.url,
       active: feeds.active,
       lastCheckedAt: feeds.lastCheckedAt,
       lastPublishedAt: feeds.lastPublishedAt,
@@ -34,6 +35,8 @@ export const getFeedsWithDetails = () =>
     .groupBy(feeds.id)
     // .orderBy(desc(feedItems.publishedAt))
     .execute();
+
+export type FeedWithDetails = Awaited<ReturnType<typeof getFeedsWithDetails>>[number];
 
 export const getFeedCount = () =>
   db

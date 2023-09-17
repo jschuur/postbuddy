@@ -1,25 +1,13 @@
+import { Suspense } from 'react';
+
 import FeedListTable from '@/components/feeds/FeedListTable';
-import { map, pick } from 'lodash';
 
-import { columns } from '@/components/feeds/FeedListTableColumns';
-import { getFeedsWithDetails } from '@/db/queries';
+import Loading from '@/app/loading';
 
-export const revalidate = 0;
-
-export default async function FeedsPage() {
-  const feeds = await getFeedsWithDetails();
-  const feedListData = map(feeds, (f) =>
-    pick(f, [
-      'name',
-      'siteUrl',
-      'itemCount',
-      'lastCheckedAt',
-      'lastPublishedAt',
-      'lastErrorAt',
-      'lastErrorMessage',
-      'active',
-    ])
+export default function FeedsPage() {
+  return (
+    <Suspense fallback={<Loading />}>
+      <FeedListTable />
+    </Suspense>
   );
-
-  return <FeedListTable data={feedListData} columns={columns} />;
 }

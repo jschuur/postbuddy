@@ -13,3 +13,19 @@ export function getErrorMessage(error: unknown) {
 
 export const dateOrNull = (d: string) =>
   new Date(d).toString() !== 'Invalid Date' ? new Date(d) : null;
+
+export function buildURL(path: string) {
+  let base: string;
+
+  if (typeof window !== 'undefined') {
+    base = '';
+  }
+
+  if (process.env.VERCEL_URL) {
+    base = `https://${process.env.VERCEL_URL}`;
+  }
+
+  base = 'http://localhost:3000';
+
+  return `${base}${path}`;
+}

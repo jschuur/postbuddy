@@ -7,18 +7,9 @@ import { DataTableColumnHeader } from '@/components/ui/datatable/DataTableColumn
 import TimeAgo from '@/components/TimeAgo';
 import FeedListRowActions from '@/components/feeds/FeedListRowActions';
 
-export type FeedList = {
-  name: string | null;
-  itemCount: number | null;
-  active: boolean | null;
-  siteUrl: string | null;
-  lastCheckedAt: Date | null;
-  lastPublishedAt: Date | null;
-  lastErrorAt: Date | null;
-  lastErrorMessage: string | null;
-};
+import { type FeedWithDetails } from '@/db/queries';
 
-export const columns: ColumnDef<FeedList>[] = [
+export const columns: ColumnDef<FeedWithDetails>[] = [
   {
     accessorKey: 'active',
   },
@@ -27,6 +18,13 @@ export const columns: ColumnDef<FeedList>[] = [
   },
   {
     accessorKey: 'lastErrorMessage',
+  },
+  {
+    accessorKey: 'id',
+    header: ({ column }) => <DataTableColumnHeader column={column} title='id' />,
+    cell: ({ row }) => {
+      return <div className='align-top'>{row.getValue('id')}</div>;
+    },
   },
   {
     accessorKey: 'name',
@@ -99,7 +97,7 @@ export const columns: ColumnDef<FeedList>[] = [
     accessorKey: 'action',
     header: '',
     cell: ({ row }) => {
-      return <FeedListRowActions name={row.getValue('name')} />;
+      return <FeedListRowActions id={row.getValue('id')} />;
     },
   },
 ];

@@ -1,7 +1,6 @@
 'use client';
 
 import {
-  ColumnDef,
   ColumnFiltersState,
   SortingState,
   VisibilityState,
@@ -11,10 +10,8 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import { PlusCircle } from 'lucide-react';
 import { useState } from 'react';
 
-import { Button } from '@/components/ui/button';
 import DataTablePagination from '@/components/ui/datatable/DataTablePagination';
 import { Input } from '@/components/ui/input';
 import {
@@ -27,19 +24,16 @@ import {
   TableRow,
 } from '@/components/ui/table';
 
+import AddFeed from '@/components/feeds/AddFeed';
+import { columns } from '@/components/feeds/FeedListTableColumns';
+
+import useFeedList from '@/hooks/useFeedList';
 import { cn } from '@/lib/utils';
 
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
-}
-
-export default function FeedListTable<TData, TValue>({
-  columns,
-  data,
-}: DataTableProps<TData, TValue>) {
+export default function FeedListTable() {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [data] = useFeedList();
 
   const [columnVisibility] = useState<VisibilityState>({
     siteUrl: false,
@@ -65,7 +59,7 @@ export default function FeedListTable<TData, TValue>({
 
   const totalFeedCount = data.length;
   const currentFeedCount = table.getRowModel().rows.length;
-  // const activeFeedCount =
+  const disabledFeedCount = table.getRowModel().rows.filter((f) => !f.getValue('active')).length;
 
   return (
     <div>
@@ -76,16 +70,14 @@ export default function FeedListTable<TData, TValue>({
           onChange={(event) => table.getColumn('name')?.setFilterValue(event.target.value)}
           className='max-w-sm'
         />
-        <Button variant='outline' size='default' className='ml-auto'>
-          <PlusCircle className='h-4 w-4 mr-2' />
-          Add Feed
-        </Button>
+        <AddFeed />
       </div>
       <div className='rounded-md border'>
         <Table>
           <TableCaption>
             Total feeds: {totalFeedCount}
-            {totalFeedCount !== currentFeedCount ? ` (${currentFeedCount} listed)` : ''}
+            {totalFeedCount !== currentFeedCount ? `, ${currentFeedCount} listed` : ''}
+            {disabledFeedCount ? `, ${disabledFeedCount} disabled` : ''}.
           </TableCaption>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (

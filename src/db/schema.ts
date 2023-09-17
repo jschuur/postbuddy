@@ -4,7 +4,7 @@ import { boolean, integer, pgTable, serial, text, timestamp, varchar } from 'dri
 export const feeds = pgTable('feeds', {
   id: serial('id').primaryKey(),
   name: text('name').notNull(),
-  url: varchar('url').unique(),
+  url: varchar('url').notNull().unique(),
   siteUrl: varchar('site_url').unique(),
   active: boolean('active').notNull().default(true),
   lastCheckedAt: timestamp('last_checked_at'),
