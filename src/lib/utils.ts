@@ -19,13 +19,10 @@ export function buildURL(path: string) {
 
   if (typeof window !== 'undefined') {
     base = '';
+  } else {
+    const hostname = process.env.SITE_DOMAIN || process.env.VERCEL_URL;
+    base = hostname ? `https://${hostname}` : 'http://localhost:3000';
   }
-
-  if (process.env.VERCEL_URL) {
-    base = `https://${process.env.VERCEL_URL}`;
-  }
-
-  base = 'http://localhost:3000';
 
   return `${base}${path}`;
 }

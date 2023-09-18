@@ -34,7 +34,7 @@ export default function FeedSheet({ id, closeMenu, children }: Props) {
       }}
     >
       <SheetTrigger asChild>{children}</SheetTrigger>
-      <SheetContent className='sm:max-w-[425px]'>
+      <SheetContent className='sm:max-w-[425px] overflow-y-scroll'>
         <SheetHeader>
           <SheetTitle>{feed?.id ? 'Edit' : 'Add'} feed</SheetTitle>
         </SheetHeader>

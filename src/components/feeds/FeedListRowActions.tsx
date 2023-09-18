@@ -1,6 +1,6 @@
 'use client';
 
-import { MoreHorizontal } from 'lucide-react';
+import { MoreVertical } from 'lucide-react';
 import { useState } from 'react';
 
 import {
@@ -12,11 +12,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useToast } from '@/components/ui/use-toast';
 
+import DeleteFeedRowAction from '@/components/feeds/DeleteFeedRowAction';
 import FeedSheet from '@/components/feeds/FeedSheet';
 
 import useFeed from '@/hooks/useFeed';
+import useUpdateFeed from '@/hooks/useUpdateFeed';
 
 interface Props {
   id: number;
@@ -24,26 +25,36 @@ interface Props {
 
 export default function FeedListRowActions({ id }: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const { toast } = useToast();
+
   const [feed] = useFeed(id);
+  const { mutate: updateFeedMutation } = useUpdateFeed();
 
   const closeMenu = () => setMenuOpen(false);
 
-  const pauseFeed = () => {
+  const toggleFeedActive = () => {
     closeMenu();
-
-    toast({
-      title: 'Feed paused',
-      description: 'TBD',
+    updateFeedMutation({
+      feed,
+      values: { active: !feed.active },
+      successMsg: (
+        <>
+          <span className='font-medium'>{feed.name}</span> {feed.active ? 'paused' : 'enabled'}
+        </>
+      ),
     });
   };
 
   const clearError = () => {
     closeMenu();
 
-    toast({
-      title: 'Clear error',
-      description: 'TBD',
+    updateFeedMutation({
+      feed,
+      values: { errorCount: 0, lastErrorAt: null, lastErrorMessage: null },
+      successMsg: (
+        <>
+          Errors cleared for <span className='font-medium'>{feed.name}</span>
+        </>
+      ),
     });
   };
 
@@ -53,10 +64,12 @@ export default function FeedListRowActions({ id }: Props) {
     if (url) window.open(url, '_blank');
   };
 
+  if (!feed) return null;
+
   return (
     <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
       <DropdownMenuTrigger asChild>
-        <MoreHorizontal tabIndex={0} />
+        <MoreVertical tabIndex={0} />
       </DropdownMenuTrigger>
       <DropdownMenuContent className='w-56'>
         <DropdownMenuLabel>{feed.name}</DropdownMenuLabel>
@@ -67,8 +80,21 @@ export default function FeedListRowActions({ id }: Props) {
               Edit feed
             </DropdownMenuItem>
           </FeedSheet>
-          <DropdownMenuItem onSelect={pauseFeed}>Pause feed</DropdownMenuItem>
-          <DropdownMenuItem onSelect={clearError}>Clear error</DropdownMenuItem>
+          <DropdownMenuItem onSelect={toggleFeedActive}>
+            {feed.active ? 'Pause' : 'Enable'} feed
+          </DropdownMenuItem>
+          <DropdownMenuItem disabled={feed.lastErrorAt === null} onSelect={clearError}>
+            Clear error
+          </DropdownMenuItem>
+          <DeleteFeedRowAction feed={feed} closeMenu={closeMenu}>
+            <DropdownMenuItem
+              onSelect={(event) => {
+                return event.preventDefault();
+              }}
+            >
+              <span className='text-red-600'>Delete feed</span>
+            </DropdownMenuItem>
+          </DeleteFeedRowAction>
           <DropdownMenuSeparator />
           {feed.url ? (
             <DropdownMenuItem onSelect={() => visitFeedUrl(feed.url)}>

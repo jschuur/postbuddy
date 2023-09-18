@@ -18,21 +18,23 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { SheetFooter } from '@/components/ui/sheet';
 import { Switch } from '@/components/ui/switch';
-import { useToast } from '@/components/ui/use-toast';
 
 import { type FeedWithDetails } from '@/db/queries';
+import useAddFeed from '@/hooks/useAddFeed';
+import useUpdateFeed from '@/hooks/useUpdateFeed';
 
-const formSchema = z.object({
+const feedFormSchema = z.object({
   name: z.string().min(2, {
     message: 'Username must be at least 2 characters.',
   }),
   url: z.string().url({
     message: 'Please enter a valid URL.',
   }),
-  // TODO: validate URL if provided
-  siteUrl: z.string().optional(),
+  siteUrl: z.string().url().or(z.literal('')),
   active: z.boolean(),
 });
+
+export type FeedFormData = z.infer<typeof feedFormSchema>;
 
 interface Props {
   feed?: FeedWithDetails;
@@ -41,9 +43,11 @@ interface Props {
 }
 
 export default function FeedForm({ feed, closeMenu, closeSheet }: Props) {
-  const { toast } = useToast();
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const { mutate: updateFeedMutation } = useUpdateFeed();
+  const { mutate: addFeedMutation } = useAddFeed();
+
+  const form = useForm<FeedFormData>({
+    resolver: zodResolver(feedFormSchema),
     defaultValues: {
       name: feed?.name || '',
       url: feed?.url || '',
@@ -52,17 +56,15 @@ export default function FeedForm({ feed, closeMenu, closeSheet }: Props) {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: FeedFormData) {
     if (closeMenu) closeMenu();
     if (closeSheet) closeSheet();
 
-    setTimeout(() => {
-      // TODO: Show feed name
-      toast({
-        title: 'Feed updated',
-        description: 'TBD',
-      });
-    }, 500);
+    if (feed?.id) {
+      updateFeedMutation({ feed, values });
+    } else {
+      addFeedMutation({ values });
+    }
   }
 
   return (

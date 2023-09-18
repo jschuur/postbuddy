@@ -74,17 +74,17 @@ export default function FeedListTable() {
       </div>
       <div className='rounded-md border'>
         <Table>
-          <TableCaption>
+          <TableCaption className='text-sm mb-2'>
             Total feeds: {totalFeedCount}
             {totalFeedCount !== currentFeedCount ? `, ${currentFeedCount} listed` : ''}
-            {disabledFeedCount ? `, ${disabledFeedCount} disabled` : ''}.
+            {disabledFeedCount ? `, ${disabledFeedCount} disabled` : ''}
           </TableCaption>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id}>
+                    <TableHead key={header.id} className='bg-slate-100'>
                       {header.isPlaceholder
                         ? null
                         : flexRender(header.column.columnDef.header, header.getContext())}
@@ -109,7 +109,7 @@ export default function FeedListTable() {
                 </TableRow>
               ))
             ) : (
-              <TableRow>
+              <TableRow onClick={() => console.log('click')}>
                 <TableCell colSpan={columns.length} className='h-24 text-center'>
                   No results.
                 </TableCell>

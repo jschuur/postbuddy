@@ -21,7 +21,7 @@ export default function FeedItem({ item, feed }: { item: FeedItemSelect; feed: F
         <p className='text-xs font-light text-gray-400'>
           {item.publishedAt && (
             <>
-              <TimeAgo date={item.publishedAt} />,{' '}
+              <TimeAgo date={item.publishedAt} toolTip />,{' '}
             </>
           )}
           <a href={feed.siteUrl || feed.url || '#'}>{feed.name}</a>

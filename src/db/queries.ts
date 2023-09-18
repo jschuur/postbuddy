@@ -4,7 +4,7 @@ import postgres from 'postgres';
 
 import { DEFAULT_ITEM_LIST_LIMIT } from '@/config';
 
-import { FeedItemInsert, FeedUpdate, feedItems, feeds } from './schema';
+import { FeedCreate, FeedItemInsert, FeedUpdate, feedItems, feeds } from './schema';
 
 const connectionString = process.env.DB_URL;
 
@@ -30,10 +30,10 @@ export const getFeedsWithDetails = () =>
       lastErrorMessage: feeds.lastErrorMessage,
       itemCount: sql<number>`count(${feedItems.id})`,
     })
-    .from(feedItems)
-    .leftJoin(feeds, eq(feeds.id, feedItems.feedId))
+    .from(feeds)
+    .leftJoin(feedItems, eq(feeds.id, feedItems.feedId))
     .groupBy(feeds.id)
-    // .orderBy(desc(feedItems.publishedAt))
+    .orderBy(sql`${feeds.lastPublishedAt} DESC NULLS LAST`)
     .execute();
 
 export type FeedWithDetails = Awaited<ReturnType<typeof getFeedsWithDetails>>[number];
@@ -44,8 +44,13 @@ export const getFeedCount = () =>
     .from(feeds)
     .then((res) => res[0].count);
 
+export const addFeed = (values: FeedCreate) =>
+  db.insert(feeds).values(values).returning().execute();
+
 export const updateFeed = (feedId: number, set: FeedUpdate) =>
   db.update(feeds).set(set).where(eq(feeds.id, feedId));
+
+export const deleteFeed = (id: number) => db.delete(feeds).where(eq(feeds.id, id));
 
 export const getRecentFeedItems = ({
   limit = DEFAULT_ITEM_LIST_LIMIT,
@@ -60,7 +65,7 @@ export const getRecentFeedItems = ({
     .select()
     .from(feedItems)
     .where(includeSeen ? sql`true` : eq(feedItems.seen, false))
-    .orderBy(desc(feedItems.publishedAt))
+    .orderBy(sql`${feedItems.publishedAt} DESC NULLS LAST`)
     .limit(limit)
     .offset(offset)
     .leftJoin(feeds, eq(feeds.id, feedItems.feedId))
