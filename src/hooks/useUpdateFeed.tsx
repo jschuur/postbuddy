@@ -43,7 +43,7 @@ export default function useUpdateFeed() {
 
       queryClient.setQueryData(
         ['feeds'],
-        previousFeeds?.map((f) => (f.id === feed.id ? { ...f, ...updateFeedCall } : f))
+        previousFeeds?.map((f) => (f.id === feed.id ? { ...f, ...updatedFeed } : f))
       );
 
       return { previousFeeds };
