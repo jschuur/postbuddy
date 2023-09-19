@@ -12,6 +12,7 @@ import {
 } from '@tanstack/react-table';
 import { useState } from 'react';
 
+import DataTableColumnSelect from '@/components/ui/datatable/DataTableColumnSelect';
 import DataTablePagination from '@/components/ui/datatable/DataTablePagination';
 import { Input } from '@/components/ui/input';
 import {
@@ -35,12 +36,17 @@ export default function FeedListTable() {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [data] = useFeedList();
 
-  const [columnVisibility] = useState<VisibilityState>({
-    siteUrl: false,
-    lastCheckedAt: false,
-    lastErrorMessage: false,
-    active: false,
+  const initialVisibilityState: Record<string, boolean> = {};
+
+  columns.forEach((column) => {
+    // @ts-ignore
+    if ((column?.meta?.startsHidden || column.meta?.neverVisible) && column?.accessorKey) {
+      // @ts-ignore
+      initialVisibilityState[column.accessorKey] = false;
+    }
   });
+
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(initialVisibilityState);
 
   const table = useReactTable({
     data,
@@ -50,6 +56,7 @@ export default function FeedListTable() {
     getSortedRowModel: getSortedRowModel(),
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
+    onColumnVisibilityChange: setColumnVisibility,
     state: {
       sorting,
       columnVisibility,
@@ -63,13 +70,16 @@ export default function FeedListTable() {
 
   return (
     <div>
-      <div className='flex items-center py-4'>
-        <Input
-          placeholder='Filter feeds...'
-          value={(table.getColumn('name')?.getFilterValue() as string) ?? ''}
-          onChange={(event) => table.getColumn('name')?.setFilterValue(event.target.value)}
-          className='max-w-sm'
-        />
+      <div className='flex items-center py-4 gap-2'>
+        <div className='grow'>
+          <Input
+            placeholder='Filter feeds...'
+            value={(table.getColumn('name')?.getFilterValue() as string) ?? ''}
+            onChange={(event) => table.getColumn('name')?.setFilterValue(event.target.value)}
+            className='max-w-sm'
+          />
+        </div>
+        <DataTableColumnSelect table={table} />
         <AddFeed />
       </div>
       <div className='rounded-md border'>
@@ -109,7 +119,7 @@ export default function FeedListTable() {
                 </TableRow>
               ))
             ) : (
-              <TableRow onClick={() => console.log('click')}>
+              <TableRow>
                 <TableCell colSpan={columns.length} className='h-24 text-center'>
                   No results.
                 </TableCell>

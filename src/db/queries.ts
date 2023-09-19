@@ -28,7 +28,11 @@ export const getFeedsWithDetails = () =>
       lastPublishedAt: feeds.lastPublishedAt,
       lastErrorAt: feeds.lastErrorAt,
       lastErrorMessage: feeds.lastErrorMessage,
-      itemCount: sql<number>`count(${feedItems.id})`,
+      errorCount: feeds.errorCount,
+      errorsResetAt: feeds.errorsResetAt,
+      itemCount: sql<number>`count(${feedItems.id})::INTEGER`,
+      createdAt: feeds.createdAt,
+      updatedAt: feeds.updatedAt,
     })
     .from(feeds)
     .leftJoin(feedItems, eq(feeds.id, feedItems.feedId))
@@ -48,7 +52,10 @@ export const addFeed = (values: FeedCreate) =>
   db.insert(feeds).values(values).returning().execute();
 
 export const updateFeed = (feedId: number, set: FeedUpdate) =>
-  db.update(feeds).set(set).where(eq(feeds.id, feedId));
+  db
+    .update(feeds)
+    .set({ ...set, updatedAt: new Date() })
+    .where(eq(feeds.id, feedId));
 
 export const deleteFeed = (id: number) => db.delete(feeds).where(eq(feeds.id, id));
 

@@ -8,8 +8,10 @@ export const revalidate = 0;
 
 export default function FeedsPage() {
   return (
-    <Suspense fallback={<Loading />}>
-      <FeedListTable />
-    </Suspense>
+    <main className='container mx-auto px-8 max-w-6xl grow'>
+      <Suspense fallback={<Loading />}>
+        <FeedListTable />
+      </Suspense>
+    </main>
   );
 }

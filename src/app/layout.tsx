@@ -24,7 +24,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={cn('flex flex-col h-screen', poppins.className)}>
         <Providers>
           <Header />
-          <main className='container mx-auto px-8 max-w-4xl grow'>{children}</main>
+          {children}
           <Footer />
           <Toaster />
         </Providers>

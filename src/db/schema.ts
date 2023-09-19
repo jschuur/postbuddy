@@ -15,6 +15,9 @@ export const feeds = pgTable('feeds', {
   errorCount: integer('error_count').notNull().default(0),
   lastErrorAt: timestamp('last_error_at'),
   lastErrorMessage: text('last_error_message'),
+  errorsResetAt: timestamp('errors_reset_at').notNull().defaultNow(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
 });
 
 export type FeedCreate = Omit<InferInsertModel<typeof feeds>, 'id'>;
@@ -32,8 +35,12 @@ export const FeedAPISchema = z.object({
   siteUrl: z.string().default(''),
   active: z.preprocess((val) => parseBoolean(val), z.boolean()).optional(),
   errorCount: z.number().optional(),
-  lastErrorAt: z.preprocess((val) => (val ? new Date(val as string) : null), z.date()).optional(),
+  lastErrorAt: z
+    .preprocess((val) => (val ? new Date(val as string) : null), z.date())
+    .optional()
+    .nullable(),
   lastErrorMessage: z.nullable(z.string().optional()),
+  errorsResetAt: z.preprocess((val) => (val ? new Date(val as string) : null), z.date()).optional(),
 });
 
 export const feedItems = pgTable('feed_items', {

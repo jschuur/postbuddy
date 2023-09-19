@@ -49,7 +49,12 @@ export default function FeedListRowActions({ id }: Props) {
 
     updateFeedMutation({
       feed,
-      values: { errorCount: 0, lastErrorAt: null, lastErrorMessage: null },
+      values: {
+        errorCount: 0,
+        lastErrorAt: null,
+        lastErrorMessage: null,
+        errorsResetAt: new Date(),
+      },
       successMsg: (
         <>
           Errors cleared for <span className='font-medium'>{feed.name}</span>
