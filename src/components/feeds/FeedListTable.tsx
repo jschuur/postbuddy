@@ -7,6 +7,7 @@ import {
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
+  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
@@ -57,6 +58,7 @@ export default function FeedListTable() {
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
+    getPaginationRowModel: getPaginationRowModel(),
     state: {
       sorting,
       columnVisibility,
