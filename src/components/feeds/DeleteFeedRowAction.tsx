@@ -50,6 +50,7 @@ export default function DeleteFeedRowAction({ children, feed, closeMenu }: Props
         </>
       }
       confirm='Yes, Delete'
+      cancel='No, Cancel'
       onConfirm={deleteFeed}
       closeMenu={closeMenu}
     >

@@ -111,7 +111,10 @@ export default function FeedListTable() {
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
                       key={cell.id}
-                      className={cn(['align-top', row.getValue('active') ? '' : 'text-slate-300'])}
+                      className={cn([
+                        'align-top p-3',
+                        row.getValue('active') ? '' : 'text-slate-300',
+                      ])}
                     >
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
