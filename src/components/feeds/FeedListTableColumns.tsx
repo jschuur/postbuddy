@@ -13,6 +13,7 @@ import { type FeedWithDetails } from '@/db/queries';
 declare module '@tanstack/react-table' {
   interface ColumnMeta<TData extends RowData, TValue> {
     neverVisible?: boolean;
+    alwaysVisible?: boolean;
     startsHidden?: boolean;
     sortHeaderName?: string;
   }
@@ -204,6 +205,9 @@ export const columns: ColumnDef<FeedWithDetails>[] = [
     header: '',
     cell: ({ row }) => {
       return <FeedListRowActions id={row.getValue('id')} />;
+    },
+    meta: {
+      alwaysVisible: true,
     },
   },
 ];

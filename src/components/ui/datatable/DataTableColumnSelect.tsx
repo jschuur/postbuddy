@@ -32,7 +32,11 @@ export default function DataTableColumnSelect<TData>({ table }: DataTableColumnS
       <DropdownMenuContent align='end'>
         {table
           .getAllColumns()
-          .filter((column) => column.getCanHide() && !column.columnDef?.meta?.neverVisible)
+          .filter(
+            (column) =>
+              column.getCanHide() &&
+              (!column.columnDef?.meta?.neverVisible || column.columnDef?.meta?.alwaysVisible)
+          )
           .map((column) => {
             return (
               <DropdownMenuCheckboxItem
