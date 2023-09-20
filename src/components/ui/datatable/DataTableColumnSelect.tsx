@@ -1,5 +1,5 @@
 import { Table } from '@tanstack/react-table';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronUp } from 'lucide-react';
 import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -15,18 +15,14 @@ interface DataTableColumnSelectProps<TData> {
 }
 
 export default function DataTableColumnSelect<TData>({ table }: DataTableColumnSelectProps<TData>) {
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [, setDropdownOpen] = useState(false);
 
   return (
     <DropdownMenu onOpenChange={setDropdownOpen}>
       <DropdownMenuTrigger asChild>
-        <Button variant='outline' className='ml-auto'>
+        <Button variant='outline' className='gap-1 [&[data-state=open]>svg]:rotate-180'>
           Columns
-          {dropdownOpen ? (
-            <ChevronUp className='h-4 w-4 ml-2' />
-          ) : (
-            <ChevronDown className='h-4 w-4 ml-2' />
-          )}
+          <ChevronUp className={`h-4 w-4 ml-2 transition-transform duration-400`} />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end'>
