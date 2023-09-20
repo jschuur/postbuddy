@@ -16,10 +16,32 @@ declare module '@tanstack/react-table' {
     alwaysVisible?: boolean;
     startsHidden?: boolean;
     sortHeaderName?: string;
+    className?: string;
+    classNameHead?: string;
+    classNameCell?: string;
   }
 }
 
 export const columns: ColumnDef<FeedWithDetails>[] = [
+  {
+    accessorKey: 'status',
+    // header: ({ column }) => <DataTableColumnHeader column={column} title='Status' />,
+    header: '',
+    cell: ({ row }) =>
+      row.getValue('errorCount') ? (
+        <div className='flex items-center justify-center'>
+          <ErrorToolTip
+            errorCount={row.getValue('errorCount')}
+            lastErrorAt={row.getValue('lastErrorAt')}
+            lastErrorMessage={row.getValue('lastErrorMessage')}
+          />
+        </div>
+      ) : null,
+    meta: {
+      alwaysVisible: true,
+      classNameCell: 'align-middle',
+    },
+  },
   {
     accessorKey: 'siteUrl',
     meta: {
@@ -60,15 +82,6 @@ export const columns: ColumnDef<FeedWithDetails>[] = [
         <div className='align-top'>
           <span className='flex items-center'>
             <a href={row.getValue('siteUrl')}>{row.getValue('name')}</a>
-            {row.getValue('errorCount') ? (
-              <ErrorToolTip
-                errorCount={row.getValue('errorCount')}
-                lastErrorAt={row.getValue('lastErrorAt')}
-                lastErrorMessage={row.getValue('lastErrorMessage')}
-              />
-            ) : (
-              ''
-            )}
           </span>
         </div>
       );

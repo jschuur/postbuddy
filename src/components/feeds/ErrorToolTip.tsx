@@ -16,7 +16,7 @@ export default function ErrorToolTip({ errorCount, lastErrorAt, lastErrorMessage
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <AlertTriangle className='ml-2 h-4 w-4 text-red-500' />
+          <AlertTriangle className='h-4 w-4 text-red-500' />
         </TooltipTrigger>
         <TooltipContent className='bg-zinc-50'>
           <div className='text-xs'>

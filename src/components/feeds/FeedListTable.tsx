@@ -85,8 +85,8 @@ export default function FeedListTable() {
         <AddFeed />
       </div>
       <div className='rounded-md border'>
-        <Table>
-          <TableCaption className='text-sm mb-2'>
+        <Table className='text-xs sm:text-sm'>
+          <TableCaption className='text-xs mb-2'>
             Total feeds: {totalFeedCount}
             {totalFeedCount !== currentFeedCount ? `, ${currentFeedCount} listed` : ''}
             {disabledFeedCount ? `, ${disabledFeedCount} disabled` : ''}
@@ -96,7 +96,14 @@ export default function FeedListTable() {
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id} className='bg-slate-100'>
+                    <TableHead
+                      key={header.id}
+                      className={cn([
+                        'bg-slate-100',
+                        header.column.columnDef.meta?.className,
+                        header.column.columnDef.meta?.classNameHead,
+                      ])}
+                    >
                       {header.isPlaceholder
                         ? null
                         : flexRender(header.column.columnDef.header, header.getContext())}
@@ -114,8 +121,10 @@ export default function FeedListTable() {
                     <TableCell
                       key={cell.id}
                       className={cn([
-                        'align-top p-3',
+                        'align-top p-2 sm:p-4',
                         row.getValue('active') ? '' : 'text-slate-300',
+                        cell.column.columnDef.meta?.className,
+                        cell.column.columnDef.meta?.classNameCell,
                       ])}
                     >
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
