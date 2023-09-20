@@ -64,6 +64,11 @@ export default function FeedListTable() {
       columnVisibility,
       columnFilters,
     },
+    initialState: {
+      pagination: {
+        pageSize: 25,
+      },
+    },
   });
 
   const totalFeedCount = data.length;
