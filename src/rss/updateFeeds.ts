@@ -44,7 +44,7 @@ async function logError({
 
   const message = `${errorMessage}${contextTxt}`;
 
-  console.error(`[${feed.name}, ${type}] ${message}`);
+  console.log(`[${feed.name}, ${type}] ${message}`);
 
   await updateFeed(feed.id, {
     errorCount: feed.errorCount + 1,
