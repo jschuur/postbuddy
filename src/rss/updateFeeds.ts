@@ -1,3 +1,4 @@
+import { pick } from 'lodash';
 import pLimit from 'p-limit';
 import pluralize from 'pluralize';
 import prettyMilliseconds from 'pretty-ms';
@@ -21,15 +22,34 @@ let feedsRemaining: number;
 let totalItemsAdded: number;
 let totalErrors: number;
 
-async function logError({ type, err, feed }: { type: string; err: unknown; feed: FeedSelect }) {
+async function logError({
+  type,
+  err,
+  feed,
+  context,
+}: {
+  type: string;
+  err: unknown;
+  feed: FeedSelect;
+  context?: string | object;
+}) {
   const errorMessage = getErrorMessage(err);
+  const contextTxt = context
+    ? `, ${
+        typeof context === 'object'
+          ? JSON.stringify(context).replaceAll(',"', ', "').replaceAll('":{', '": {')
+          : context
+      }`
+    : '';
 
-  console.log(`[${feed.name}] ${type} error: ${errorMessage}`);
+  const message = `${errorMessage}${contextTxt}`;
+
+  console.error(`[${feed.name}, ${type}] ${message}`);
 
   await updateFeed(feed.id, {
     errorCount: feed.errorCount + 1,
     lastErrorAt: new Date(),
-    lastErrorMessage: `[${type}] ${errorMessage}`,
+    lastErrorMessage: `[${type}] ${message}`,
   });
 
   totalErrors++;
@@ -62,57 +82,70 @@ async function updateOneFeed({
         )}, attempting to add new ones`
       );
 
-      try {
-        let itemsAdded = 0;
+      let itemsAdded = 0;
 
-        for (const item of feedResult.items) {
-          if (item.link) {
-            try {
-              const [returningItem] = await addFeedItem({
-                title: item.title?.trim() || DEFAULT_FEED_ITEM_TITLE,
-                url: item.link,
-                feedId,
-                guid: item.guid || item.link,
-                publishedAt: item.pubDate ? dateOrNull(item.pubDate) : null,
-                description: item.contentSnippet?.trim(),
-                content: item.content?.trim(),
-                enclosureUrl: item.enclosure?.url,
-                enclosureType: item.enclosure?.type,
-              });
+      for (const item of feedResult.items) {
+        if (item.link) {
+          try {
+            const [returningItem] = await addFeedItem({
+              title: item.title?.trim() || DEFAULT_FEED_ITEM_TITLE,
+              url: item.link,
+              feedId,
+              guid: item.guid || item.link,
+              publishedAt: item.pubDate ? dateOrNull(item.pubDate) : null,
+              description: item.contentSnippet?.trim(),
+              content: item.content?.trim(),
+              enclosureUrl: item.enclosure?.url,
+              enclosureType: item.enclosure?.type,
+            });
 
-              if (returningItem.id > lastFeedItemId) {
-                itemsAdded++;
-                totalItemsAdded++;
+            if (returningItem.id > lastFeedItemId) {
+              itemsAdded++;
+              totalItemsAdded++;
 
-                log(`added '${returningItem.title}'`);
-              }
-            } catch (err) {
-              await logError({ type: 'addFeedItem', err, feed });
+              log(`added '${returningItem.title}'`);
             }
+          } catch (err) {
+            await logError({
+              type: 'addFeedItem',
+              err,
+              feed,
+              context: {
+                feed: pick(feed, ['url']),
+                item: pick(item, ['title', 'link', 'guid']),
+              },
+            });
           }
         }
-
-        log(
-          `check completed, ${
-            itemsAdded ? `(${pluralize('new item', itemsAdded, true)})` : 'no new items'
-          }`
-        );
-      } catch (err) {
-        await logError({ type: 'updateFeed', err, feed });
       }
+
+      log(
+        `check completed, ${
+          itemsAdded ? `(${pluralize('new item', itemsAdded, true)})` : 'no new items'
+        }`
+      );
+
+      try {
+        await updateFeed(feedId, {
+          lastCheckedAt: new Date(),
+          checkedCount: feed.checkedCount + 1,
+        });
+      } catch (err) {
+        await logError({
+          type: 'updateFeed',
+          err,
+          feed,
+          context: { feed: pick(feed, ['url']) },
+        });
+      }
+
+      feedsRemaining--;
+
+      if (feedsRemaining > 0) console.log(`${feedsRemaining} feeds still updating`);
     } catch (err) {
-      await logError({ type: 'parseURL', err, feed });
-    } finally {
-      await updateFeed(feedId, {
-        lastCheckedAt: new Date(),
-        checkedCount: feed.checkedCount + 1,
-      });
+      await logError({ type: 'parseURL', err, feed, context: { feed: pick(feed, ['url']) } });
     }
   }
-
-  feedsRemaining--;
-
-  if (feedsRemaining > 0) console.log(`${feedsRemaining} feeds still updating`);
 }
 
 export default async function updateFeeds() {

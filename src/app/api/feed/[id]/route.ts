@@ -11,18 +11,19 @@ type Params = {
 
 export async function PATCH(request: Request, { params }: { params: Params }) {
   const id = parseInt(params.id, 10);
+  let values;
 
   try {
     if (!request.body) throw new Error('Missing feed update params (no body)');
 
     const body = await request.json();
-    const values = FeedAPISchema.omit({ id: true }).partial().parse(body);
+    values = FeedAPISchema.omit({ id: true }).partial().parse(body);
 
     await updateFeed(id, values);
 
     return NextResponse.json({ status: 'success', updated: { id, ...values } });
   } catch (err) {
-    console.error('feed PATCH error', { err });
+    console.error('feed PATCH error', { err, values });
 
     return NextResponse.json({ status: 'error', message: getErrorMessage(err) }, { status: 500 });
   }
@@ -36,7 +37,7 @@ export async function DELETE(request: Request, { params }: { params: Params }) {
 
     return NextResponse.json({ status: 'success' });
   } catch (err) {
-    console.error('feed DELETE error', { err });
+    console.error('feed DELETE error', { err, id });
 
     return NextResponse.json({ status: 'error', message: getErrorMessage(err) }, { status: 500 });
   }
