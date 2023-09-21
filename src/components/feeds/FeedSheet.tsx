@@ -7,6 +7,7 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import { useState } from 'react';
+import { useHotkeys } from 'react-hotkeys-hook';
 
 import FeedForm from '@/components/feeds/FeedForm';
 
@@ -21,6 +22,13 @@ interface Props {
 export default function FeedSheet({ id, closeMenu, children }: Props) {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [feed] = useFeed(id);
+  useHotkeys(
+    'a',
+    () => {
+      setSheetOpen(true);
+    },
+    { preventDefault: true }
+  );
 
   const closeSheet = () => setSheetOpen(false);
 

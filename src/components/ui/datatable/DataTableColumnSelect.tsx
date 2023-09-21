@@ -1,6 +1,7 @@
 import { Table } from '@tanstack/react-table';
 import { ChevronUp, Tally4 } from 'lucide-react';
 import { useState } from 'react';
+import { useHotkeys } from 'react-hotkeys-hook';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -15,10 +16,17 @@ interface DataTableColumnSelectProps<TData> {
 }
 
 export default function DataTableColumnSelect<TData>({ table }: DataTableColumnSelectProps<TData>) {
-  const [, setDropdownOpen] = useState(false);
+  const [drownOpen, setDropdownOpen] = useState(false);
+  useHotkeys(
+    'c',
+    () => {
+      setDropdownOpen(true);
+    },
+    { preventDefault: true }
+  );
 
   return (
-    <DropdownMenu onOpenChange={setDropdownOpen}>
+    <DropdownMenu open={drownOpen} onOpenChange={setDropdownOpen}>
       <DropdownMenuTrigger asChild>
         <Button variant='outline' className='gap-1 [&[data-state=open]>svg]:rotate-180'>
           <span className='hidden sm:inline'>Columns</span>

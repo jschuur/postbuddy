@@ -11,7 +11,8 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import { useHotkeys } from 'react-hotkeys-hook';
 
 import DataTableColumnSelect from '@/components/ui/datatable/DataTableColumnSelect';
 import DataTablePagination from '@/components/ui/datatable/DataTablePagination';
@@ -35,7 +36,19 @@ import { cn } from '@/lib/utils';
 export default function FeedListTable() {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const filterRef = useRef<HTMLInputElement>(null);
   const [data] = useFeedList();
+
+  useHotkeys(
+    '/',
+    (event) => {
+      console.log('/');
+      if (filterRef) {
+        filterRef.current?.focus();
+      }
+    },
+    { preventDefault: true }
+  );
 
   const initialVisibilityState: Record<string, boolean> = {};
 
@@ -80,6 +93,7 @@ export default function FeedListTable() {
       <div className='flex items-center py-4 gap-2'>
         <div className='grow'>
           <Input
+            ref={filterRef}
             placeholder='Filter feeds...'
             value={(table.getColumn('name')?.getFilterValue() as string) ?? ''}
             onChange={(event) => table.getColumn('name')?.setFilterValue(event.target.value)}
