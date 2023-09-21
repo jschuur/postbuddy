@@ -24,6 +24,7 @@ export const getFeedsWithDetails = () =>
       siteUrl: feeds.siteUrl,
       url: feeds.url,
       active: feeds.active,
+      checkedCount: feeds.checkedCount,
       lastCheckedAt: feeds.lastCheckedAt,
       lastPublishedAt: feeds.lastPublishedAt,
       lastErrorAt: feeds.lastErrorAt,

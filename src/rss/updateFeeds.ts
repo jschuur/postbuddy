@@ -92,8 +92,6 @@ async function updateOneFeed({
           }
         }
 
-        await updateFeed(feedId, { lastCheckedAt: new Date() });
-
         log(
           `check completed, ${
             itemsAdded ? `(${pluralize('new item', itemsAdded, true)})` : 'no new items'
@@ -104,6 +102,11 @@ async function updateOneFeed({
       }
     } catch (err) {
       await logError({ type: 'parseURL', err, feed });
+    } finally {
+      await updateFeed(feedId, {
+        lastCheckedAt: new Date(),
+        checkedCount: feed.checkedCount + 1,
+      });
     }
   }
 

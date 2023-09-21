@@ -10,6 +10,7 @@ export const feeds = pgTable('feeds', {
   url: varchar('url').notNull().unique(),
   siteUrl: varchar('site_url').notNull().default(''),
   active: boolean('active').notNull().default(true),
+  checkedCount: integer('checked_count').notNull().default(0),
   lastCheckedAt: timestamp('last_checked_at'),
   lastPublishedAt: timestamp('last_published_at'),
   errorCount: integer('error_count').notNull().default(0),
