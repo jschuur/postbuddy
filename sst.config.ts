@@ -27,6 +27,7 @@ export default {
       });
 
       if (!process.env.DB_URL) throw Error('Missing DB_URL');
+      if (!process.env.CLERK_SECRET_KEY) throw Error('Missing CLERK_SECRET_KEY');
 
       const cronDisabled = process.env.IS_LOCAL || boolean(process.env.CRON_DISABLED);
       console.log(` cron: ${cronDisabled ? pc.red('disabled') : pc.green('enabled')}`);
@@ -39,6 +40,8 @@ export default {
             timeout: 900,
             environment: {
               DB_URL: process.env.DB_URL,
+              CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY,
+              ADMIN_USER_ID: process.env.ADMIN_USER_ID || '',
             },
           },
         },

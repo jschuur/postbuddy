@@ -1,22 +1,27 @@
+import { Inbox } from 'lucide-react';
 import Link from 'next/link';
 
 import { cn } from '@/lib/utils';
 
 export default function MainNav({ className, ...props }: React.HTMLAttributes<HTMLElement>) {
   return (
-    <nav className={cn('flex items-center space-x-4 lg:space-x-6', className)} {...props}>
-      <Link href='/' className='text-medium font-medium transition-colors hover:text-primary'>
-        PostBuddy
+    <nav className={cn('flex items-center gap-2 lg:gap-4', className)} {...props}>
+      <Link
+        href='/'
+        className='flex items-center gap-2 font-medium transition-colors text-medium hover:text-primary'
+      >
+        <Inbox />
+        <span className='hidden sm:inline'>PostBuddy</span>
       </Link>
       <Link
         href='/items'
-        className='text-medium font-medium text-muted-foreground transition-colors hover:text-primary'
+        className='font-medium transition-colors text-medium text-muted-foreground hover:text-primary'
       >
         Items
       </Link>
       <Link
         href='/feeds'
-        className='text-medium font-medium text-muted-foreground transition-colors hover:text-primary'
+        className='font-medium transition-colors text-medium text-muted-foreground hover:text-primary'
       >
         Feeds
       </Link>

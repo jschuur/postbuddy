@@ -1,5 +1,6 @@
 'use client';
 
+import { ExclamationTriangleIcon } from '@radix-ui/react-icons';
 import {
   ColumnFiltersState,
   SortingState,
@@ -14,6 +15,7 @@ import {
 import { useRef, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import DataTableColumnSelect from '@/components/ui/datatable/DataTableColumnSelect';
 import DataTablePagination from '@/components/ui/datatable/DataTablePagination';
 import { Input } from '@/components/ui/input';
@@ -42,10 +44,7 @@ export default function FeedListTable() {
   useHotkeys(
     '/',
     (event) => {
-      console.log('/');
-      if (filterRef) {
-        filterRef.current?.focus();
-      }
+      if (filterRef) filterRef.current?.focus();
     },
     { preventDefault: true }
   );
@@ -84,13 +83,22 @@ export default function FeedListTable() {
     },
   });
 
-  const totalFeedCount = data.length;
+  if (!data?.length)
+    return (
+      <Alert variant='destructive' className='m-8'>
+        <ExclamationTriangleIcon className='w-4 h-4' />
+        <AlertTitle>Error</AlertTitle>
+        <AlertDescription>No feed list available.</AlertDescription>
+      </Alert>
+    );
+
+  const totalFeedCount = data?.length;
   const currentFeedCount = table.getRowModel().rows.length;
   const disabledFeedCount = table.getRowModel().rows.filter((f) => !f.getValue('active')).length;
 
   return (
     <div>
-      <div className='flex items-center py-4 gap-2'>
+      <div className='flex items-center gap-2 py-4'>
         <div className='grow'>
           <Input
             ref={filterRef}
@@ -103,9 +111,9 @@ export default function FeedListTable() {
         <DataTableColumnSelect table={table} />
         <AddFeed />
       </div>
-      <div className='rounded-md border'>
+      <div className='border rounded-md'>
         <Table className='text-xs sm:text-sm'>
-          <TableCaption className='text-xs mb-2'>
+          <TableCaption className='mb-2 text-xs'>
             Total feeds: {totalFeedCount}
             {totalFeedCount !== currentFeedCount ? `, ${currentFeedCount} listed` : ''}
             {disabledFeedCount ? `, ${disabledFeedCount} disabled` : ''}
