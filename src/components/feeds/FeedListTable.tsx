@@ -16,6 +16,7 @@ import { useRef, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
 import DataTableColumnSelect from '@/components/ui/datatable/DataTableColumnSelect';
 import DataTablePagination from '@/components/ui/datatable/DataTablePagination';
 import { Input } from '@/components/ui/input';
@@ -28,18 +29,22 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import getQueryClient from '@/lib/queryClient';
 
 import AddFeed from '@/components/feeds/AddFeed';
 import { columns } from '@/components/feeds/FeedListTableColumns';
 
 import useFeedList from '@/hooks/useFeedList';
 import { cn } from '@/lib/utils';
+import { RefreshCw } from 'lucide-react';
+
+const queryClient = getQueryClient();
 
 export default function FeedListTable() {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const filterRef = useRef<HTMLInputElement>(null);
-  const [data] = useFeedList();
+  const [data, { isFetching, refetch }] = useFeedList();
 
   useHotkeys(
     '/',
@@ -108,6 +113,9 @@ export default function FeedListTable() {
             className='max-w-sm'
           />
         </div>
+        <Button variant={'outline'} onClick={() => refetch()}>
+          <RefreshCw className={cn(['w-4 h-4 cursor-pointer', isFetching && 'animate-spin'])} />
+        </Button>
         <DataTableColumnSelect table={table} />
         <AddFeed />
       </div>

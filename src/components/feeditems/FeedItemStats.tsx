@@ -10,7 +10,7 @@ export default async function FeedItemStats() {
 
   return (
     <p className='py-4'>
-      {pluralize('feed item', feedItemCount, true)} from {pluralize('feed', feedCount, true)} feeds.{' '}
+      {pluralize('feed item', feedItemCount, true)} from {pluralize('feed', feedCount, true)}.{' '}
       {feedItemCount > DEFAULT_ITEM_LIST_LIMIT
         ? `Showing most recent ${DEFAULT_ITEM_LIST_LIMIT}:`
         : ''}
