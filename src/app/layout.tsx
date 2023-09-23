@@ -6,7 +6,6 @@ import './globals.css';
 
 import { Toaster } from '@/components/ui/toaster';
 
-import Footer from '@/components/layout/Footer';
 import Header from '@/components/layout/Header';
 import Providers from './providers';
 
@@ -23,11 +22,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <ClerkProvider>
       <html lang='en'>
-        <body className={cn('flex flex-col h-screen', poppins.className)}>
+        <body className={cn('flex flex-col', poppins.className)}>
           <Providers>
             <Header />
             {children}
-            <Footer />
             <Toaster />
           </Providers>
         </body>
