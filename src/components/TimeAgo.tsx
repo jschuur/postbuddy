@@ -45,10 +45,12 @@ function formatDistance(
 
 export default function TimeAgo({
   date,
-  toolTip = false,
+  toolTip = true,
+  addSuffix = true,
 }: {
   date: Date | string | null;
   toolTip?: boolean;
+  addSuffix?: boolean;
 }) {
   const dateObj = typeof date === 'string' ? new Date(date) : date;
 
@@ -60,7 +62,7 @@ export default function TimeAgo({
         <TooltipTrigger asChild>
           <>
             <span className='hidden sm:inline'>
-              {formatDistanceToNowStrict(dateObj, { addSuffix: true })}
+              {formatDistanceToNowStrict(dateObj, { addSuffix })}
             </span>
             <span className='sm:hidden'>
               {formatDistanceToNowStrict(dateObj, {
@@ -82,6 +84,6 @@ export default function TimeAgo({
       </Tooltip>
     </TooltipProvider>
   ) : (
-    formatDistanceToNowStrict(dateObj, { addSuffix: true })
+    formatDistanceToNowStrict(dateObj, { addSuffix })
   );
 }

@@ -9,6 +9,7 @@ import ErrorToolTip from '@/components/feeds/ErrorToolTip';
 import FeedListRowActions from '@/components/feeds/FeedListRowActions';
 
 import { type FeedWithDetails } from '@/db/queries';
+import pluralize from 'pluralize';
 
 declare module '@tanstack/react-table' {
   interface ColumnMeta<TData extends RowData, TValue> {
@@ -138,6 +139,8 @@ export const columns: ColumnDef<FeedWithDetails>[] = [
     cell: ({ row }) => {
       const lastErrorMessage = row.getValue<string>('lastErrorMessage');
       const lastErrorAt = row.getValue<Date>('lastErrorAt');
+      const errorCount = row.getValue<number>('errorCount');
+      const errorsResetAt = row.getValue<Date>('errorsResetAt');
 
       return (
         <div className='align-top'>
@@ -147,7 +150,15 @@ export const columns: ColumnDef<FeedWithDetails>[] = [
             </div>
           )}
           {lastErrorMessage && (
-            <div className='text-xs font-light text-slate-500'>{lastErrorMessage}</div>
+            <div className='text-xs'>
+              <div>
+                Latest of {pluralize('error', errorCount, true)} in{' '}
+                <TimeAgo date={errorsResetAt} addSuffix={false} />:
+              </div>
+              <div className='p-2 mt-2 font-light border bg-slate-100 text-slate-500'>
+                {lastErrorMessage}
+              </div>
+            </div>
           )}
         </div>
       );
