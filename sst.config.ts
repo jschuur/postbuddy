@@ -41,7 +41,6 @@ export default {
             environment: {
               DB_URL: process.env.DB_URL,
               CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY,
-              ADMIN_USER_ID: process.env.ADMIN_USER_ID || '',
             },
           },
         },

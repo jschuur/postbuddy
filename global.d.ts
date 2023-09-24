@@ -3,7 +3,6 @@ declare global {
     interface ProcessEnv {
       DB_URL: string;
       CLERK_SECRET_KEY: string;
-      ADMIN_USER_ID: string;
     }
   }
 }

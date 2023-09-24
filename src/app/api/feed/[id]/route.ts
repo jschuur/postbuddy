@@ -1,6 +1,8 @@
+import { auth } from '@clerk/nextjs';
 import { NextResponse } from 'next/server';
 
-import { getErrorMessage } from '@/lib/utils';
+import { unauthorised } from '@/app/api/apiUtils';
+import { getErrorMessage, isAdmin } from '@/lib/utils';
 
 import { deleteFeed, updateFeed } from '@/db/queries';
 import { FeedAPISchema } from '@/db/schema';
@@ -12,6 +14,9 @@ type Params = {
 export async function PATCH(request: Request, { params }: { params: Params }) {
   const id = parseInt(params.id, 10);
   let values;
+
+  const { sessionClaims: claims } = auth();
+  if (!isAdmin(claims)) return unauthorised;
 
   try {
     if (!request.body) throw new Error('Missing feed update params (no body)');
@@ -31,6 +36,9 @@ export async function PATCH(request: Request, { params }: { params: Params }) {
 
 export async function DELETE(request: Request, { params }: { params: Params }) {
   const id = parseInt(params.id, 10);
+
+  const { sessionClaims: claims } = auth();
+  if (!isAdmin(claims)) return unauthorised;
 
   try {
     await deleteFeed(id);

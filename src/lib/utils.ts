@@ -26,3 +26,6 @@ export function buildURL(path: string) {
 
   return `${base}${path}`;
 }
+
+export const isAdmin = (session: Record<string, any> | null | undefined) =>
+  Boolean(session?.admin) || Boolean(session?.user?.publicMetadata?.admin);

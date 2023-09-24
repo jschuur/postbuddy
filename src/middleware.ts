@@ -1,24 +1,25 @@
 import { authMiddleware, redirectToSignIn } from '@clerk/nextjs';
 import { NextResponse } from 'next/server';
 
-import { buildURL } from './lib/utils';
+import { unauthorised } from '@/app/api/apiUtils';
+import { buildURL, isAdmin } from '@/lib/utils';
 
-const unauthorized = new NextResponse(undefined, {
-  status: 401,
-  statusText: 'Unauthorized',
-});
+const adminRoutes = ['/feeds'];
+const isAdminRoute = (path: string) => adminRoutes.find((route) => path.startsWith(route));
 
 const redirect = (path: string) => NextResponse.redirect(buildURL(path));
 
 export default authMiddleware({
   publicRoutes: ['/'],
-  afterAuth: (auth, req) => {
-    const { userId, isApiRoute, isPublicRoute } = auth;
+  afterAuth: async (auth, req) => {
+    const { userId, isPublicRoute, isApiRoute, sessionClaims } = auth;
+    const { pathname: path } = req.nextUrl;
 
-    if (!isPublicRoute) if (!userId) return redirectToSignIn({ returnBackUrl: req.url });
+    if (!isPublicRoute) {
+      if (!userId) return isApiRoute ? unauthorised : redirectToSignIn({ returnBackUrl: req.url });
 
-    if (process.env.ADMIN_USER_ID && userId !== process.env.ADMIN_USER_ID)
-      return isApiRoute ? unauthorized : redirect('/');
+      if (isAdminRoute(path) && !isAdmin(sessionClaims)) return redirect('/');
+    }
 
     return NextResponse.next();
   },

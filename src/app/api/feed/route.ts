@@ -1,12 +1,17 @@
+import { auth } from '@clerk/nextjs';
 import { NextResponse } from 'next/server';
 
-import { getErrorMessage } from '@/lib/utils';
+import { unauthorised } from '@/app/api/apiUtils';
+import { getErrorMessage, isAdmin } from '@/lib/utils';
 
 import { addFeed } from '@/db/queries';
 import { FeedInsertSchema } from '@/db/schema';
 
 export async function POST(request: Request) {
   let values;
+
+  const { sessionClaims: claims } = auth();
+  if (!isAdmin(claims)) return unauthorised;
 
   try {
     if (!request.body) throw new Error('Missing feed add params (no body)');
